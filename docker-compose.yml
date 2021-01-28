@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  web:
+    build: .
+    command: node app.js
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8081:8081"
