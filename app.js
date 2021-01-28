@@ -1,3 +1,4 @@
+require('dotenv').config();
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
@@ -5,19 +6,17 @@ const io = require('socket.io')(http, {
 });
 const port = process.env.PORT || 8081;
 
-
-
 // worker connect kafka
 const { Kafka, logLevel } = require('kafkajs')
-const host = 'kafka'
+
 
 const kafka = new Kafka({
     logLevel: logLevel.INFO,
-    brokers: [`${host}:19091`],
+    brokers: [`${process.env.KAFKA_HOST}:${process.env.KAFKA_PORT}`],
     clientId: 'example-consumer',
 })
 
-const topic = 'images'
+const topic = process.env.KAFKA_TOPIC_IMAGE
 const consumer = kafka.consumer({ groupId: 'test-group' })
 
 const run = async () => {
