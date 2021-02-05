@@ -1,9 +1,9 @@
+const { setInterval } = require('timers');
+
 require('dotenv').config();
 const app = require('express')();
 const http = require('http').Server(app);
-const io = require('socket.io')(http, {
-    transports: ['websocket', 'jsonp-polling']
-});
+const io = require('socket.io')(http);
 const port = process.env.PORT || 8081;
 
 // worker connect kafka
@@ -23,16 +23,13 @@ const run = async () => {
     await consumer.connect()
     await consumer.subscribe({ topic, fromBeginning: true })
     await consumer.run({
-        // eachBatch: async ({ batch }) => {
-        //   console.log(batch)
-        // },
         eachMessage: async ({ topic, partition, message }) => {
-            console.log(message.value.toString())
-            io.emit('result', { message: message.value.toString()});
-            // connection.sendUTF('Connection accepted.!');
-        },
+            io.emit('result', message.value.toString());
+        }
     })
 }
+
+
 
 run().catch(e => console.error(`[example/consumer] ${e.message}`, e))
 
@@ -62,8 +59,9 @@ signalTraps.map(type => {
     })
 })
 
-
 http.listen(port, function(){
     console.log('listening on *:' + port);
 });
+
+
 
